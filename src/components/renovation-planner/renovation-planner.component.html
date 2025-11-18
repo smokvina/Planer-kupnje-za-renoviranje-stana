@@ -1,0 +1,572 @@
+<div class="flex flex-col gap-8">
+  <div class="bg-cyan-50 p-6 rounded-lg shadow-md border-l-4 border-cyan-500">
+    <h2 class="text-2xl font-semibold text-cyan-800 mb-4">Detaljna AI Analiza Projekta Renovacije</h2>
+    <p class="text-cyan-700 mb-4">Opišite svoj projekt renovacije (npr. "adaptacija kupaonice u stanu starom 40 godina, želim pametna rješenja i visoku energetsku učinkovitost") i AI će vam generirati detaljnu analizu, uključujući radove, potrebne stručnjake i procijenjene tržišne cijene.</p>
+    <textarea
+      rows="5"
+      placeholder="Npr. 'renoviranje stana od 70m2, promjena rasporeda kuhinje i kupaonice, uključivanje pametnih sustava, nova stolarija'"
+      class="p-3 border border-gray-300 rounded-md w-full mb-4 focus:ring-2 focus:ring-cyan-400 focus:border-transparent"
+      [(ngModel)]="detailedAnalysisPrompt"
+      [disabled]="renovationService.isGeneratingDetailedAnalysis() || renovationService.isGenerating() || renovationService.isGeneratingShoppingList() || renovationService.isGeneratingOperationalBrief()"
+    ></textarea>
+    @if (renovationService.aiError() && renovationService.isGeneratingDetailedAnalysis()) {
+      <p class="text-red-600 text-sm mb-4">{{ renovationService.aiError() }}</p>
+    }
+    <button
+      (click)="onGenerateDetailedAnalysis()"
+      [disabled]="renovationService.isGeneratingDetailedAnalysis() || renovationService.isGenerating() || renovationService.isGeneratingShoppingList() || renovationService.isGeneratingOperationalBrief()"
+      class="w-full bg-cyan-600 text-white p-3 rounded-md font-bold hover:bg-cyan-700 transition-colors duration-200 flex items-center justify-center mb-4"
+    >
+      @if (renovationService.isGeneratingDetailedAnalysis()) {
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Generiram detaljnu analizu...
+      } @else {
+        Generiraj detaljnu analizu
+      }
+    </button>
+
+    @if (renovationService.detailedAnalysisResult()) {
+      <div class="bg-cyan-100 p-4 rounded-md mt-4 text-gray-800 border border-cyan-200" [innerHTML]="renovationService.detailedAnalysisResult()">
+      </div>
+      <div class="flex gap-4 mt-4">
+        <button
+          (click)="copyDetailedAnalysis()"
+          class="flex-1 bg-gray-200 text-gray-700 p-3 rounded-md font-bold hover:bg-gray-300 transition-colors duration-200"
+        >
+          Kopiraj analizu
+        </button>
+        <button
+          (click)="downloadDetailedAnalysisTxt()"
+          class="flex-1 bg-gray-200 text-gray-700 p-3 rounded-md font-bold hover:bg-gray-300 transition-colors duration-200"
+        >
+          Preuzmi analizu (.txt)
+        </button>
+      </div>
+    } @else {
+      <p class="text-gray-700 mb-4">
+        Ovaj dio pruža sveobuhvatnu AI analizu vašeg projekta renovacije, uključujući faze rada, potrebnu dokumentaciju,
+        angažman stručnjaka i procjene troškova. Unesite detaljan opis projekta iznad i pritisnite "Generiraj detaljnu analizu".
+      </p>
+    }
+  </div>
+
+  <div class="bg-teal-50 p-6 rounded-lg shadow-md border-l-4 border-teal-500">
+    <h2 class="text-2xl font-semibold text-teal-800 mb-4">Generiranje popisa uz pomoć umjetne inteligencije</h2>
+    <p class="text-teal-700 mb-4">Opišite svoj projekt renovacije (npr. "stan 50m2, moderan stil") i AI će vam generirati početni popis materijala.</p>
+    <textarea
+      rows="3"
+      placeholder="Npr. 'renoviranje kupaonice, površine 5m2, želim walk-in tuš i podno grijanje'"
+      class="p-3 border border-gray-300 rounded-md w-full mb-4 focus:ring-2 focus:ring-teal-400 focus:border-transparent"
+      [(ngModel)]="aiPrompt"
+      [disabled]="renovationService.isGenerating() || renovationService.isGeneratingDetailedAnalysis() || renovationService.isGeneratingShoppingList() || renovationService.isGeneratingOperationalBrief()"
+    ></textarea>
+    @if (renovationService.aiError() && renovationService.isGenerating()) {
+      <p class="text-red-600 text-sm mb-4">{{ renovationService.aiError() }}</p>
+    }
+    <button
+      (click)="onGenerateList()"
+      [disabled]="renovationService.isGenerating() || renovationService.isGeneratingDetailedAnalysis() || renovationService.isGeneratingShoppingList() || renovationService.isGeneratingOperationalBrief()"
+      class="w-full bg-teal-600 text-white p-3 rounded-md font-bold hover:bg-teal-700 transition-colors duration-200 flex items-center justify-center"
+    >
+      @if (renovationService.isGenerating()) {
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Generiram popis...
+      } @else {
+        Generiraj popis materijala
+      }
+    </button>
+  </div>
+
+  <div class="bg-gray-100 p-6 rounded-lg shadow-md">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Dodaj novu stavku</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-4">
+      <input
+        type="text"
+        placeholder="Naziv stavke (npr. Keramičke pločice)"
+        class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+        [(ngModel)]="newItemName"
+      />
+      <input
+        type="text"
+        placeholder="Kategorija (npr. Kupaonica)"
+        class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+        [(ngModel)]="newItemCategory"
+      />
+      <input
+        type="number"
+        placeholder="Količina"
+        min="1"
+        class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+        [(ngModel)]="newItemQuantity"
+      />
+      <input
+        type="text"
+        placeholder="Jedinica (npr. m2, kom, lit)"
+        class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+        [(ngModel)]="newItemUnit"
+      />
+      <input
+        type="number"
+        placeholder="Cijena po jedinici"
+        min="0"
+        step="0.01"
+        class="p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-indigo-400 focus:border-transparent"
+        [(ngModel)]="newItemPricePerUnit"
+      />
+    </div>
+    <button
+      (click)="addItem()"
+      class="w-full bg-indigo-600 text-white p-3 rounded-md font-bold hover:bg-indigo-700 transition-colors duration-200"
+    >
+      Dodaj stavku na popis
+    </button>
+  </div>
+
+  <div class="bg-stone-100 p-6 rounded-lg shadow-inner border-2 border-stone-300">
+    <h2 class="text-2xl font-semibold text-stone-800 mb-4">Stručnjaci potrebni za renovaciju (Informacije)</h2>
+    <p class="text-stone-700 mb-4">Ovaj odjeljak pruža opće informacije o stručnjacima; za personaliziranu analizu s cijenama, koristite "Detaljnu AI Analizu Projekta Renovacije" iznad.</p>
+    <ul class="list-disc list-inside space-y-2 text-gray-700">
+      <li>
+        <span class="font-medium text-stone-900">Arhitekt/Dizajner interijera:</span>
+        Zadužen za idejni projekt, izradu tlocrtnog rješenja, raspored prostorija i namještaja, odabir boja i materijala te kreiranje estetski i funkcionalno privlačnog interijera. Pomaže u vizualizaciji konačnog izgleda.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Građevinski inženjer (Statičar):</span>
+        Ključan kod zahvata koji uključuju rušenje nosivih zidova ili bilo kakve konstrukcijske promjene. Procjenjuje stabilnost objekta i izrađuje statički elaborat kako bi osigurao sigurnost i trajnost konstrukcije.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Vodoinstalater:</span>
+        Izvodi sve radove vezane uz vodovod i odvodnju. To uključuje postavljanje novih cijevi, premještanje postojećih instalacija, ugradnju sanitarija (tuševi, kade, WC školjke, umivaonici) te spajanje bojlera i ostalih uređaja.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Električar:</span>
+        Odgovoran za sve električne instalacije. Postavlja nove utičnice, prekidače, rasvjetna tijela, izvodi nove strujne krugove, instalira rasvjetu te osigurava funkcionalnost i sigurnost električne mreže u stanu.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Keramičar:</span>
+        Specijaliziran za postavljanje keramičkih pločica na podove i zidove u kupaonicama, kuhinjama, hodnicima i drugim prostorijama. Osigurava pravilnu pripremu podloge, precizno postavljanje i kvalitetno fugiranje.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Parketar/Podopolagač:</span>
+        Zadužen za postavljanje svih vrsta podnih obloga – parketa, laminata, vinila, LVT-a. Po potrebi obavlja brušenje i lakiranje postojećeg parketa te pripremu podloge za nove obloge.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Zidar/Ličilac/Knaufer:</span>
+        Ova grupa uključuje zidare za grube radove (zidanje, rušenje pregradnih zidova), knaufere za suhomontažne radove (izrada pregradnih zidova od gips-kartonskih ploča, spuštenih stropova) i ličioce/soboslikare za pripremu zidova (gletanje, brušenje) i bojanje.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Stolar/Izrađivač namještaja po mjeri:</span>
+        Angažira se za izradu kuhinja po mjeri, ugradbenih ormara, polica i ostalog namještaja koji se prilagođava specifičnim dimenzijama i potrebama prostora, optimizirajući svaki kutak stana.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Izvođač radova/Voditelj projekta:</span>
+        Ukoliko ne želite sami koordinirati sve majstore, izvođač radova ili voditelj projekta preuzima organizaciju, nadzor i koordinaciju svih faza radova, osiguravajući poštivanje rokova, budžeta i kvalitete "ključ u ruke" projekta.
+      </li>
+      <li>
+        <span class="font-medium text-stone-900">Stolar (za prozore i vrata):</span>
+        Specijaliziran za demontažu stare i montažu nove stolarije – prozora, balkonskih i ulaznih/sobnih vrata. Osigurava pravilno brtvljenje i funkcionalnost.
+      </li>
+    </ul>
+  </div>
+
+  @if (renovationService.allItems().length > 0) {
+    <div class="bg-teal-50 p-6 rounded-lg shadow-md">
+      <h2 class="text-2xl font-semibold text-teal-800 mb-4">Troškovi po kategorijama</h2>
+      <div class="w-full h-72 relative">
+        <svg #chartRef class="w-full h-full"></svg>
+      </div>
+    </div>
+  }
+
+  <div class="bg-white p-6 rounded-lg shadow-xl border border-gray-200">
+    <h2 class="text-2xl font-semibold text-gray-800 mb-4">Vaš popis za kupnju za renovaciju</h2>
+
+    @if (renovationService.allItems().length === 0) {
+      <p class="text-gray-500 text-center py-4">Vaš popis za kupnju je prazan. Započnite dodavanjem stavki iznad!</p>
+    } @else {
+      <div class="overflow-x-auto mb-4 hidden md:block">
+        <table class="min-w-full bg-white border border-gray-200 rounded-lg">
+          <thead class="bg-gray-50">
+            <tr>
+              <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kupljeno</th>
+              <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Naziv stavke</th>
+              <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kategorija</th>
+              <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Količina</th>
+              <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jedinica</th>
+              <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cijena/Jedinica</th>
+              <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ukupna cijena</th>
+              <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Akcije</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200">
+            @for (categoryGroup of renovationService.categorizedItems(); track categoryGroup.categoryName) {
+              <tr class="bg-gray-200 border-b border-gray-300">
+                <td colspan="8" class="py-2 px-4 text-left text-base font-bold text-gray-700 sticky top-0 bg-gray-200 z-10">
+                  {{ categoryGroup.categoryName }}
+                </td>
+              </tr>
+              @for (item of categoryGroup.items; track item.id) {
+                <tr [class.bg-green-50]="item.purchased" [class.text-gray-500]="item.purchased">
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      [checked]="item.purchased"
+                      (change)="togglePurchased(item)"
+                      class="form-checkbox h-5 w-5 text-indigo-600 rounded"
+                    />
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap" [class.line-through]="item.purchased">
+                    <input
+                      type="text"
+                      [value]="item.name"
+                      (change)="updateName(item, $event)"
+                      class="w-full p-1 border border-gray-300 rounded-md"
+                      [disabled]="item.purchased"
+                    />
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <input
+                      type="text"
+                      [value]="item.category"
+                      (change)="updateCategory(item, $event)"
+                      class="w-full p-1 border border-gray-300 rounded-md"
+                      [disabled]="item.purchased"
+                    />
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <div class="flex items-center space-x-1">
+                      <button
+                        (click)="decreaseQuantity(item)"
+                        [disabled]="item.purchased || item.quantity <= 1"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded-md text-sm font-bold"
+                      >-</button>
+                      <input
+                        type="number"
+                        [value]="item.quantity"
+                        (change)="updateQuantity(item, $event)"
+                        min="1"
+                        class="w-16 p-1 border border-gray-300 rounded-md text-center"
+                        [disabled]="item.purchased"
+                      />
+                      <button
+                        (click)="increaseQuantity(item)"
+                        [disabled]="item.purchased"
+                        class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded-md text-sm font-bold"
+                      >+</button>
+                    </div>
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <input
+                      type="text"
+                      [value]="item.unit"
+                      (change)="updateUnit(item, $event)"
+                      class="w-16 p-1 border border-gray-300 rounded-md text-center"
+                      [disabled]="item.purchased"
+                    />
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <input
+                      type="number"
+                      [value]="item.pricePerUnit"
+                      (change)="updatePricePerUnit(item, $event)"
+                      min="0"
+                      step="0.01"
+                      class="w-24 p-1 border border-gray-300 rounded-md text-center"
+                      [disabled]="item.purchased"
+                    />
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap font-semibold">
+                    {{ item.totalCost | currency:'EUR':'symbol':'1.2-2':'hr-HR' }}
+                  </td>
+                  <td class="py-3 px-4 whitespace-nowrap">
+                    <button
+                      (click)="removeItem(item.id)"
+                      class="text-red-600 hover:text-red-800 transition-colors duration-200 font-medium"
+                    >
+                      Ukloni
+                    </button>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="md:hidden space-y-4 mb-4">
+        @for (categoryGroup of renovationService.categorizedItems(); track categoryGroup.categoryName) {
+          <h3 class="text-xl font-extrabold text-gray-700 mb-2 mt-4 px-2 py-1 bg-gray-200 rounded-md sticky top-0 z-10 border-b border-gray-300">
+            {{ categoryGroup.categoryName }}
+          </h3>
+          @for (item of categoryGroup.items; track item.id) {
+            <div class="border border-gray-200 rounded-lg p-4 shadow-sm" [class.bg-green-50]="item.purchased" [class.text-gray-500]="item.purchased">
+              <div class="flex items-center justify-between mb-2">
+                <div class="flex items-center gap-2 w-full pr-2">
+                  <input
+                    type="checkbox"
+                    [checked]="item.purchased"
+                    (change)="togglePurchased(item)"
+                    class="form-checkbox h-5 w-5 text-indigo-600 rounded flex-shrink-0"
+                  />
+                  <input
+                    type="text"
+                    [value]="item.name"
+                    (change)="updateName(item, $event)"
+                    class="font-bold text-lg w-full p-1 border border-gray-300 rounded-md"
+                    [class.line-through]="item.purchased"
+                    [disabled]="item.purchased"
+                  />
+                </div>
+                <button
+                  (click)="removeItem(item.id)"
+                  class="text-red-600 hover:text-red-800 transition-colors duration-200 font-medium flex-shrink-0"
+                >
+                  Ukloni
+                </button>
+              </div>
+
+              <div class="grid grid-cols-1 gap-2 text-sm mb-2">
+                <div>
+                  <span class="font-medium text-gray-600">Kategorija:</span>
+                  <input
+                    type="text"
+                    [value]="item.category"
+                    (change)="updateCategory(item, $event)"
+                    class="w-full max-w-xs p-1 border border-gray-300 rounded-md inline-block ml-1"
+                    [disabled]="item.purchased"
+                  />
+                </div>
+                <div class="flex items-center">
+                  <span class="font-medium text-gray-600 mr-1">Količina:</span>
+                  <button
+                    (click)="decreaseQuantity(item)"
+                    [disabled]="item.purchased || item.quantity <= 1"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded-md text-sm font-bold"
+                  >-</button>
+                  <input
+                    type="number"
+                    [value]="item.quantity"
+                    (change)="updateQuantity(item, $event)"
+                    min="1"
+                    class="w-16 p-1 border border-gray-300 rounded-md text-center mx-1"
+                    [disabled]="item.purchased"
+                  />
+                  <button
+                    (click)="increaseQuantity(item)"
+                    [disabled]="item.purchased"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-2 py-1 rounded-md text-sm font-bold"
+                  >+</button>
+                </div>
+                <div>
+                  <span class="font-medium text-gray-600">Jedinica:</span>
+                  <input
+                    type="text"
+                    [value]="item.unit"
+                    (change)="updateUnit(item, $event)"
+                    class="w-full max-w-24 p-1 border border-gray-300 rounded-md text-center inline-block ml-1"
+                    [disabled]="item.purchased"
+                  />
+                </div>
+                <div>
+                  <span class="font-medium text-gray-600">Cijena/Jedinica:</span>
+                  <input
+                    type="number"
+                    [value]="item.pricePerUnit"
+                    (change)="updatePricePerUnit(item, $event)"
+                    min="0"
+                    step="0.01"
+                    class="w-full max-w-24 p-1 border border-gray-300 rounded-md text-center inline-block ml-1"
+                    [disabled]="item.purchased"
+                  />
+                </div>
+              </div>
+              <div class="text-right font-bold text-xl mt-2">
+                Ukupno: <span class="text-indigo-600">{{ item.totalCost | currency:'EUR':'symbol':'1.2-2':'hr-HR' }}</span>
+              </div>
+            </div>
+          }
+        }
+      </div>
+
+      <div class="flex flex-col md:flex-row justify-between items-center bg-gray-50 p-4 rounded-lg border border-gray-200 gap-4">
+        <div class="flex flex-col gap-2 w-full md:w-auto">
+          <div class="text-xl font-bold text-gray-800">
+            Ukupni procijenjeni troškovi: <span class="text-indigo-600">{{ renovationService.totalBudget() | currency:'EUR':'symbol':'1.2-2':'hr-HR' }}</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <label for="userBudget" class="font-bold text-gray-800">Moj budžet:</label>
+            <input
+              id="userBudget"
+              type="number"
+              [value]="renovationService.userBudget()"
+              (change)="updateUserBudget($event)"
+              min="0"
+              step="100"
+              class="w-32 p-2 border border-gray-300 rounded-md text-center"
+            />
+          </div>
+          <div class="text-xl font-bold text-gray-800">
+            Razlika:
+            <span
+              [class.text-green-600]="renovationService.budgetDifference() >= 0"
+              [class.text-red-600]="renovationService.budgetDifference() < 0"
+            >
+              {{ renovationService.budgetDifference() | currency:'EUR':'symbol':'1.2-2':'hr-HR' }}
+            </span>
+          </div>
+        </div>
+        <div class="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+          <button
+            (click)="copyShoppingList()"
+            [disabled]="renovationService.allItems().length === 0"
+            class="bg-gray-200 text-gray-700 p-3 rounded-md font-bold hover:bg-gray-300 transition-colors duration-200 w-full md:w-auto"
+          >
+            Kopiraj popis
+          </button>
+          <button
+            (click)="exportListToTxt()"
+            [disabled]="renovationService.allItems().length === 0"
+            class="bg-green-600 text-white p-3 rounded-md font-bold hover:bg-green-700 transition-colors duration-200 w-full md:w-auto"
+          >
+            Izvezi u TXT
+          </button>
+          <button
+            (click)="clearAll()"
+            [disabled]="renovationService.allItems().length === 0"
+            class="bg-red-500 text-white p-3 rounded-md font-bold hover:bg-red-600 transition-colors duration-200 w-full md:w-auto"
+          >
+            Obriši sve stavke
+          </button>
+        </div>
+      </div>
+    }
+
+    <div class="mt-8">
+      @if (renovationService.aiError() && renovationService.isGeneratingShoppingList()) {
+        <p class="text-red-600 text-sm mb-4">{{ renovationService.aiError() }}</p>
+      }
+      <button
+        (click)="onGenerateShoppingList()"
+        [disabled]="renovationService.allItems().length === 0 || renovationService.isGeneratingShoppingList() || renovationService.isGenerating() || renovationService.isGeneratingDetailedAnalysis() || renovationService.isGeneratingOperationalBrief()"
+        class="w-full bg-orange-600 text-white p-3 rounded-md font-bold hover:bg-orange-700 transition-colors duration-200 flex items-center justify-center"
+      >
+        @if (renovationService.isGeneratingShoppingList()) {
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Generiram shopping listu...
+        } @else {
+          Napravi shopping listu
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (renovationService.shoppingListSuggestions().length > 0 || renovationService.isGeneratingShoppingList()) {
+    <div class="bg-green-50 p-6 rounded-lg shadow-inner border-2 border-green-300">
+      <h2 class="text-2xl font-semibold text-green-800 mb-4">AI-generirana Shopping Lista</h2>
+      @if (renovationService.isGeneratingShoppingList()) {
+        <div class="flex items-center justify-center p-4 text-green-600 font-medium">
+          <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-green-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          Učitavam prijedloge proizvoda...
+        </div>
+      } @else if (renovationService.aiError() && renovationService.shoppingListSuggestions().length === 0) {
+        <p class="text-red-600 text-sm mb-4">{{ renovationService.aiError() }}</p>
+      } @else if (renovationService.shoppingListSuggestions().length > 0) {
+        @for (storeGroup of groupedShoppingListSuggestions(); track storeGroup.storeName) {
+          <div class="mb-6 border border-green-200 rounded-lg p-4 bg-green-100">
+            <h3 class="text-xl font-bold text-green-800 mb-3">{{ storeGroup.storeName }}</h3>
+            @for (categoryGroup of storeGroup.categories; track categoryGroup.categoryName) {
+              <div class="mb-4 ml-4">
+                <h4 class="text-lg font-semibold text-green-700 mb-2">{{ categoryGroup.categoryName }}</h4>
+                @for (product of categoryGroup.products; track product.productName + product.webShopLink) {
+                  <div class="border-b border-green-200 last:border-b-0 py-2">
+                    <p class="font-medium text-gray-800">{{ product.productName }}</p>
+                    <p class="text-gray-700 text-sm">Izvorna stavka: <span class="font-normal">{{ product.originalShoppingItemName }}</span></p>
+                    <p class="text-green-600 font-bold text-base">Cijena: {{ product.suggestedPrice | currency:'EUR':'symbol':'1.2-2':'hr-HR' }}</p>
+                    @if (product.webShopLink) {
+                      <a [href]="product.webShopLink" target="_blank" rel="noopener noreferrer" class="text-indigo-500 hover:underline text-sm break-all">
+                        Link: {{ product.webShopLink }}
+                      </a>
+                    }
+                  </div>
+                }
+              </div>
+            }
+          </div>
+        }
+        <div class="flex gap-4 mt-4">
+          <button
+            (click)="copyShoppingListSuggestions()"
+            class="flex-1 bg-gray-200 text-gray-700 p-3 rounded-md font-bold hover:bg-gray-300 transition-colors duration-200"
+          >
+            Kopiraj shopping listu
+          </button>
+          <button
+            (click)="downloadShoppingListSuggestionsTxt()"
+            class="flex-1 bg-gray-200 text-gray-700 p-3 rounded-md font-bold hover:bg-gray-300 transition-colors duration-200"
+          >
+            Preuzmi shopping listu (.txt)
+          </button>
+        </div>
+      } @else {
+        <p class="text-gray-700 mb-4">Generirana shopping lista će se prikazati ovdje.</p>
+      }
+    </div>
+  }
+
+  <div class="bg-purple-50 p-6 rounded-lg shadow-md border-l-4 border-purple-500">
+    <h2 class="text-2xl font-semibold text-purple-800 mb-4">Operativna AI Analiza Projekta (Sažetak)</h2>
+    <p class="text-purple-700 mb-4">Nakon što generirate detaljnu analizu, popis materijala i shopping listu, AI može stvoriti konačni operativni sažetak s ključnim zaključcima, prioritetima i upozorenjima.</p>
+    
+    @if (renovationService.aiError() && renovationService.isGeneratingOperationalBrief()) {
+      <p class="text-red-600 text-sm mb-4">{{ renovationService.aiError() }}</p>
+    }
+    
+    <button
+      (click)="onGenerateOperationalBrief()"
+      [disabled]="!renovationService.detailedAnalysisResult() && renovationService.allItems().length === 0 || renovationService.isGenerating() || renovationService.isGeneratingDetailedAnalysis() || renovationService.isGeneratingShoppingList() || renovationService.isGeneratingOperationalBrief()"
+      class="w-full bg-purple-600 text-white p-3 rounded-md font-bold hover:bg-purple-700 transition-colors duration-200 flex items-center justify-center disabled:bg-gray-400 disabled:cursor-not-allowed"
+      [title]="!renovationService.detailedAnalysisResult() && renovationService.allItems().length === 0 ? 'Generirajte detaljnu analizu ili popis materijala prije sažetka' : 'Generiraj operativni sažetak'"
+    >
+      @if (renovationService.isGeneratingOperationalBrief()) {
+        <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        Generiram sažetak...
+      } @else {
+        Generiraj Operativni Sažetak
+      }
+    </button>
+
+    @if (renovationService.operationalBriefResult()) {
+      <div class="bg-purple-100 p-4 rounded-md mt-4 text-gray-800 border border-purple-200" [innerHTML]="renovationService.operationalBriefResult()">
+      </div>
+      <div class="flex gap-4 mt-4">
+        <button
+          (click)="copyOperationalBrief()"
+          class="flex-1 bg-gray-200 text-gray-700 p-3 rounded-md font-bold hover:bg-gray-300 transition-colors duration-200"
+        >
+          Kopiraj sažetak
+        </button>
+        <button
+          (click)="downloadOperationalBriefTxt()"
+          class="flex-1 bg-gray-200 text-gray-700 p-3 rounded-md font-bold hover:bg-gray-300 transition-colors duration-200"
+        >
+          Preuzmi sažetak (.txt)
+        </button>
+      </div>
+    }
+  </div>
+</div>

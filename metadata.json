@@ -1,0 +1,5 @@
+{
+  "name": "Planer kupnje za renoviranje stana",
+  "description": "AI-pokretan planer kupnje koji vam pomaže organizirati i pratiti stavke za vaš projekt renovacije stana, uključujući količine, cijene i ukupne troškove. Ova verzija se fokusira na osnovnu funkcionalnost planiranja.",
+  "requestFramePermissions": []
+}
